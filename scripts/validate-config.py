@@ -11,6 +11,7 @@ Checks:
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -18,6 +19,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 AGENTS_DIR = REPO_ROOT / ".agents" / "agents"
 SKILLS_DIR = REPO_ROOT / ".agents" / "skills"
+PLUGIN_MANIFEST = REPO_ROOT / "kimi.plugin.json"
 
 # Flag common secret-bearing keys with non-empty values.
 SECRET_KEY_RE = re.compile(
@@ -86,6 +88,57 @@ def validate_skill(path: Path) -> list[str]:
     return errors
 
 
+PLUGIN_NAME_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,63}$")
+
+
+def validate_plugin() -> list[str]:
+    errors: list[str] = []
+    if not PLUGIN_MANIFEST.exists():
+        return errors
+
+    try:
+        manifest = json.loads(PLUGIN_MANIFEST.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        return [f"{PLUGIN_MANIFEST}: invalid JSON ({exc})"]
+
+    name = manifest.get("name")
+    if not name:
+        errors.append(f"{PLUGIN_MANIFEST}: missing 'name'")
+    elif not isinstance(name, str) or not PLUGIN_NAME_RE.match(name):
+        errors.append(f"{PLUGIN_MANIFEST}: 'name' must match [a-z0-9][a-z0-9_-]{{0,63}}")
+
+    for field in ("version", "description"):
+        if not manifest.get(field):
+            errors.append(f"{PLUGIN_MANIFEST}: missing '{field}'")
+
+    for key in ("skills", "agents", "systemPromptPath"):
+        value = manifest.get(key)
+        if value:
+            path = REPO_ROOT / value
+            if not path.exists():
+                errors.append(f"{PLUGIN_MANIFEST}: '{key}' path does not exist: {value}")
+
+    for i, hook in enumerate(manifest.get("hooks", [])):
+        event = hook.get("event")
+        command = hook.get("command", "")
+        if event == "UserPromptSubmit":
+            # Rough check: ensure the script file exists if command references a ./ path
+            parts = command.split()
+            for part in parts:
+                if part.startswith("./"):
+                    script_path = REPO_ROOT / part
+                    if not script_path.exists():
+                        errors.append(
+                            f"{PLUGIN_MANIFEST}: hook[{i}] script does not exist: {part}"
+                        )
+                    elif not script_path.is_file():
+                        errors.append(
+                            f"{PLUGIN_MANIFEST}: hook[{i}] path is not a file: {part}"
+                        )
+
+    return errors
+
+
 def validate_no_secrets() -> list[str]:
     errors: list[str] = []
     text_extensions = {".md", ".json", ".toml", ".yaml", ".yml", ".py", ".sh", ".txt"}
@@ -115,6 +168,7 @@ def main() -> int:
         for skill_file in sorted(SKILLS_DIR.rglob("SKILL.md")):
             all_errors.extend(validate_skill(skill_file))
 
+    all_errors.extend(validate_plugin())
     all_errors.extend(validate_no_secrets())
 
     if all_errors:

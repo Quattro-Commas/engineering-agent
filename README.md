@@ -9,6 +9,8 @@ A reusable Kimi Code configuration that turns the CLI into a disciplined full-st
 - `.agents/skills/*` — reusable skills for project bootstrap, prompt engineering, product discovery, architecture, UI, API, migrations, browser verification, security review, and release engineering.
 - `.kimi-code/mcp.json` — Playwright MCP server for browser verification.
 - `SYSTEM.md` — template for a user-level system prompt that applies prompt-engineering discipline to every session.
+- `kimi.plugin.json` — plugin manifest so the whole configuration can be installed via `/plugins install`.
+- `hooks/` — lifecycle hooks, including `UserPromptSubmit` prompt engineering.
 - `docs/` — product brief, architecture, acceptance criteria, progress log, and runbook.
 
 ## How to use it
@@ -60,6 +62,27 @@ cp SYSTEM.md ~/.kimi-code/SYSTEM.md
 ```
 
 This replaces the default main-agent system prompt with the prompt-engineering discipline. Changes take effect in new sessions.
+
+## Install as a Kimi Code plugin
+
+For the most automatic setup, install the repo as a plugin. This enables the prompt-engineering `UserPromptSubmit` hook and injects the discipline into every session, regardless of which agent you select.
+
+```bash
+/plugins install https://github.com/Quattro-Commas/engineering-agent
+```
+
+Then reload or start a new session:
+
+```bash
+/reload
+```
+
+The plugin ships:
+
+- All engineering-agent skills under `/skill:<name>`
+- The `product-engineer` agent available as a sub-agent
+- A `UserPromptSubmit` hook that scaffolds vague requests
+- Playwright MCP for browser verification
 
 ## Validation
 

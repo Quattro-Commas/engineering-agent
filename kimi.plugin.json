@@ -1,0 +1,31 @@
+{
+  "name": "engineering-agent",
+  "version": "0.2.0",
+  "description": "Reusable Kimi Code configuration for disciplined full-stack product engineering: prompt engineering, delivery contract, reusable skills, and browser verification.",
+  "keywords": ["engineering", "product-engineer", "prompt-engineering", "skills", "agent-config"],
+  "homepage": "https://github.com/Quattro-Commas/engineering-agent",
+  "license": "MIT",
+  "interface": {
+    "displayName": "Engineering Agent",
+    "shortDescription": "Disciplined full-stack product engineering agent configuration"
+  },
+  "skills": "./.agents/skills/",
+  "agents": "./.agents/agents/",
+  "systemPromptPath": "./SYSTEM.md",
+  "sessionStart": {
+    "skill": "prompt-engineer"
+  },
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    }
+  },
+  "hooks": [
+    {
+      "event": "UserPromptSubmit",
+      "command": "python3 ./hooks/prompt-engineer.py",
+      "timeout": 5
+    }
+  ]
+}
