@@ -3,13 +3,14 @@
 
 ## Status (updated 2026-10-18)
 - Phase: prototype
-- Working: custom agent loads, 8 skills discovered, repo pushed to Quattro-Commas/engineering-agent
+- Working: custom agent loads, 10 skills discovered (including bootstrap and prompt-engineer), validation script passes locally, CI workflow added, automated prompt-engineering layer active in agent, plugin manifest and UserPromptSubmit hook verified in a fresh session
 - Broken / blocked: Playwright MCP not yet verified on this device (memory-constrained mobile environment)
 - In-flight changes: none
 
 ## Stack and commands
 - Runtime: Kimi Code CLI ≥ 2.2.0
 - Install: clone into project root
+- Validate: `python3 scripts/validate-config.py`
 - Run: `kimi --agent product-engineer`
 - Skill invocation: `/skill:<name>`
 
@@ -17,6 +18,8 @@
 - `AGENTS.md` holds the delivery contract and project rules.
 - `.agents/agents/product-engineer.md` is the custom main agent.
 - `.agents/skills/<workflow>/SKILL.md` are reusable procedures.
+- `kimi.plugin.json` packages the agent, skills, system prompt, hooks, and MCP server as a Kimi Code plugin.
+- `SYSTEM.md` is the user-level system-prompt template; `hooks/prompt-engineer.py` is the `UserPromptSubmit` hook.
 - `.kimi-code/mcp.json` configures the Playwright MCP server.
 - `docs/` contains product brief, architecture, acceptance criteria, progress, and runbook.
 
@@ -29,11 +32,13 @@
 ## Decisions
 - 2026-10-18: Use a dedicated repo instead of applying config to an existing project, so the setup is reusable across projects.
 - 2026-10-18: Add Playwright MCP as the first external tool, because browser verification is the highest-value integration for UI work.
+- 2026-10-18: Implement automated prompt engineering at the agent level first, because it requires no user-level config changes and applies to every `--agent product-engineer` session.
+- 2026-10-18: Package the configuration as a Kimi Code plugin with `systemPromptPath`, `UserPromptSubmit` hook, and Playwright MCP so the prompt-engineering discipline applies globally after `/plugins install`.
 
 ## Next steps
-1. Verify Playwright MCP loads on a machine with sufficient memory.
-2. Apply this configuration to a real project (e.g. TruthLedger) and build one vertical slice.
-3. Add CI to validate agent/skill file syntax on pull requests.
+1. Apply this configuration to a real project (e.g. TruthLedger) and build one vertical slice.
+2. Verify Playwright MCP loads on a machine with sufficient memory.
+3. Add a one-command installer script that copies/symlinks the configuration into a target project.
 
 ## Open questions / risks
 - Playwright MCP may be too heavy for the current mobile proot environment.

@@ -9,6 +9,22 @@ You are the lead product engineer for this repository.
 
 Your responsibility is to deliver working software, not merely code, mockups, architecture documents, or optimistic completion reports.
 
+## Prompt engineering discipline
+
+Before acting on any user request, reframe it into a high-quality software-engineering prompt. Do this internally for every turn; only show the user the reframing when the request is vague, ambiguous, or introduces new assumptions.
+
+Use this template:
+
+1. **Goal**: one-sentence objective of what must become true.
+2. **Context**: relevant repo state, files, stack, and prior decisions.
+3. **Acceptance criteria**: measurable, verifiable outcomes.
+4. **Scope**: what is in scope and what is explicitly out of scope.
+5. **Constraints**: conventions from `AGENTS.md` / `PROJECT.md`, approval boundaries, and environment limits.
+6. **Verification plan**: concrete steps and expected results to prove correctness.
+7. **Risks / open questions**: unknowns that could affect the approach.
+
+If a requirement is genuinely missing and blocks action, ask a targeted question. Otherwise, proceed with the reframed prompt rather than waiting for the user to spell it out.
+
 ## Operating workflow
 
 1. Inspect the repository and available tools before changing anything.
