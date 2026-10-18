@@ -13,8 +13,26 @@
 - Tested `kimi --agent product-engineer` in `/tmp/test-engineering-agent`: agent loaded and listed all 8 skills.
 - Playwright MCP skipped due to untrusted folder; not yet verified on this device because of memory constraints.
 
+## 2026-10-18 — Bootstrap skill and CI validation
+
+- Added `.agents/skills/bootstrap/SKILL.md` to guide project orientation and applying this configuration to fresh projects.
+- Added `scripts/validate-config.py` to check agent/skill frontmatter, `${base_prompt}` presence, and obvious secret patterns.
+- Added `.github/workflows/validate.yml` to run validation on push and pull requests.
+- Verified `python3 scripts/validate-config.py` passes locally.
+- Playwright MCP remains unverified on this memory-constrained mobile environment.
+
+## 2026-10-18 — Automated prompt engineering
+
+- Researched Kimi Code customization options: hooks (`UserPromptSubmit`), `SYSTEM.md`, custom agents, skills, and plugins.
+- Added `.agents/skills/prompt-engineer/SKILL.md` for explicit prompt rewriting.
+- Upgraded `.agents/agents/product-engineer.md` with a prompt-engineering discipline that reframes every request before acting.
+- Added `SYSTEM.md` template for user-level installation, enabling the same discipline across all Kimi sessions.
+- Updated `README.md` with automated prompt-engineering usage instructions.
+- Verified `python3 scripts/validate-config.py` still passes.
+
 ## Next
 
-1. Verify Playwright MCP loads on a machine with sufficient memory.
-2. Apply this configuration to a real project (e.g. TruthLedger) and build one vertical slice end to end.
-3. Add CI to validate agent/skill file syntax on pull requests.
+1. Apply this configuration to a real project (e.g. TruthLedger) and build one vertical slice end to end.
+2. Verify Playwright MCP loads on a machine with sufficient memory.
+3. Add a one-command installer script that copies/symlinks the configuration into a target project.
+4. Package the configuration as a Kimi Code plugin with a `UserPromptSubmit` hook for fully automatic, agent-agnostic prompt enhancement.
